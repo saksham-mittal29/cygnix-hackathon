@@ -1,0 +1,132 @@
+.dashboard-actions {
+  margin-bottom: 24px;
+}
+
+.vacation-mode-btn {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: all 0.15s ease;
+}
+
+.vacation-mode-btn:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.vacation-mode-btn.active {
+  background-color: var(--accent-orange-light);
+  border-color: var(--accent-orange);
+  color: var(--accent-orange-text);
+}
+
+/* Zone Cards Grid */
+.zones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  max-width: 800px;
+}
+
+.zone-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.15s ease;
+}
+
+.zone-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.zone-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.zone-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.zone-entity-id {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.zone-mode-badge {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mode-cool {
+  background-color: #f1f5f9;
+  color: var(--text-secondary);
+  border: 1px solid #e2e8f0;
+}
+
+.mode-cooling {
+  background-color: #eff6ff;
+  color: var(--primary-blue);
+  border: 1px solid #bfdbfe;
+}
+
+.mode-heating {
+  background-color: #fff7ed;
+  color: var(--accent-orange);
+  border: 1px solid #fed7aa;
+}
+
+.zone-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.zone-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.zone-stat-label {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.zone-stat-value {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.cycle-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background-color: #f1f5f9;
+  color: var(--text-secondary);
+  border: 1px solid #e2e8f0;
+}
