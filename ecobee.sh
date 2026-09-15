@@ -1,0 +1,20 @@
+#!/bin/bash
+# Check for URL expiration
+
+# Check for wget/curl
+if hash wget 2>/dev/null; then
+    program="wget -O"
+elif hash curl 2>/dev/null; then
+    program="curl -o"
+else
+    echo "Could not find wget or curl."
+    exit
+fi
+
+# Download files one by one
+if [ ! -f ecobee.raw.rar ]; then
+$program "ecobee.raw.rar" "https://buildingbenchmark-data.s3.amazonaws.com/bbd/ecobee/raw/ecobee.raw.rar?response-content-disposition=%27attachment%3B%20filename%3D%22ecobee.raw.rar%22%3B%27&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIA3WTYYL2RAXTPV3PV%2F20260915%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260915T082620Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEDEaCXVzLXdlc3QtMiJGMEQCIDxjwlLjVgsQ%2F0T%2FwnhqFTt6%2FaXrOson4%2BrzUFIz9YvlAiBMJsgr9uILeZYrJKp3NhE%2FiwO7goAWdOQ4SU07UFS%2FBSr7Awj6%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAIaDDgwNDQ4NTg4MTUwNiIMje6FV9uu5rDxAEvHKs8DdSssGY1Rp2zV4CZNNuR%2Fep08gfAEd5vdQJKHLNs03v7DtD70CFMplINucpGpYp6r3v6xatA53gQ2Uq6D5%2BDTTcPZf1Sjm9JMSsHmUCOKQR6deNjR2Z9BC%2F5VD8yuqSClaJ8ObTuami0akWNxDFqk3kA1vusml%2FsE6yboNQwDTxLOnJUl%2FpKeCXU7F4zGH7aKI5ct%2BXLDj6Srph%2BnYwb%2BjTco4hGbK8PvqOVkrEz6662wD0Y87H%2FBXs3aE4GHA6SZx9lkLZ0ro6LQtPS3SneMQ5e5u%2Bf5SPdEQowLz5wve4CzMT7LXh2hzjAkB47Dsqvj1ABqV6%2Ffhib5y%2BIB3y3bQJv4AX969lhyAgi3wC55whSJn4LQ3gkeXX%2BjXn0CzJFih3sT2MEW7UFXDyqrUmxdRvhFUiTmm48z3%2BHKpWaf%2B5glcLMLE1eqesREFcIAuNAGNP0EqOkawlfSVnkq7NiLV4IQwSl0dwT74w5odQ52zeFQN3zQ07YKONsxBEniU4IPsnqMoc%2Fvs1bbw%2FGxoG%2F5LDQaE%2ByJq6H4u45RBI9y4wx8CfOSa9Q6F%2F6SnGYMeZEor9DctYbTEQ3s6CgwWUY0l9GtCf75sbqE0thPQORvUDChgqTVBjqiAdb4ls4KwpCruAKGL9eFlNk4xgvIiXHhiAAVm1T5TIzmmRv2JUXkalitKWF2OEUHiFa7XE%2BZAWRhFS0pnmnNYawOe7txA4q19ukLMlH6bmU0ZJM%2BFPKeUEAdc0FAxxvVxdvlljZhwhyUXODN95ML4bpqcp5lt59AdGtx5ITRoCgC3UJhUBN3SrtpkU686PqGZpZNxiQpe9LY9wDDrwzPIJ2Lrw%3D%3D&X-Amz-Signature=69bfb8355c71ea128b8811feafffabe45facc2fb4513b00f49ab7412101b5e71"
+fi
+if [ ! -f ecobee.processed.zip ]; then
+$program "ecobee.processed.zip" "https://buildingbenchmark-data.s3.amazonaws.com/bbd/ecobee/processed/ecobee.processed.zip?response-content-disposition=%27attachment%3B%20filename%3D%22ecobee.processed.zip%22%3B%27&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIA3WTYYL2RAXTPV3PV%2F20260915%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20260915T082620Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEDEaCXVzLXdlc3QtMiJGMEQCIDxjwlLjVgsQ%2F0T%2FwnhqFTt6%2FaXrOson4%2BrzUFIz9YvlAiBMJsgr9uILeZYrJKp3NhE%2FiwO7goAWdOQ4SU07UFS%2FBSr7Awj6%2F%2F%2F%2F%2F%2F%2F%2F%2F%2F8BEAIaDDgwNDQ4NTg4MTUwNiIMje6FV9uu5rDxAEvHKs8DdSssGY1Rp2zV4CZNNuR%2Fep08gfAEd5vdQJKHLNs03v7DtD70CFMplINucpGpYp6r3v6xatA53gQ2Uq6D5%2BDTTcPZf1Sjm9JMSsHmUCOKQR6deNjR2Z9BC%2F5VD8yuqSClaJ8ObTuami0akWNxDFqk3kA1vusml%2FsE6yboNQwDTxLOnJUl%2FpKeCXU7F4zGH7aKI5ct%2BXLDj6Srph%2BnYwb%2BjTco4hGbK8PvqOVkrEz6662wD0Y87H%2FBXs3aE4GHA6SZx9lkLZ0ro6LQtPS3SneMQ5e5u%2Bf5SPdEQowLz5wve4CzMT7LXh2hzjAkB47Dsqvj1ABqV6%2Ffhib5y%2BIB3y3bQJv4AX969lhyAgi3wC55whSJn4LQ3gkeXX%2BjXn0CzJFih3sT2MEW7UFXDyqrUmxdRvhFUiTmm48z3%2BHKpWaf%2B5glcLMLE1eqesREFcIAuNAGNP0EqOkawlfSVnkq7NiLV4IQwSl0dwT74w5odQ52zeFQN3zQ07YKONsxBEniU4IPsnqMoc%2Fvs1bbw%2FGxoG%2F5LDQaE%2ByJq6H4u45RBI9y4wx8CfOSa9Q6F%2F6SnGYMeZEor9DctYbTEQ3s6CgwWUY0l9GtCf75sbqE0thPQORvUDChgqTVBjqiAdb4ls4KwpCruAKGL9eFlNk4xgvIiXHhiAAVm1T5TIzmmRv2JUXkalitKWF2OEUHiFa7XE%2BZAWRhFS0pnmnNYawOe7txA4q19ukLMlH6bmU0ZJM%2BFPKeUEAdc0FAxxvVxdvlljZhwhyUXODN95ML4bpqcp5lt59AdGtx5ITRoCgC3UJhUBN3SrtpkU686PqGZpZNxiQpe9LY9wDDrwzPIJ2Lrw%3D%3D&X-Amz-Signature=53e42362be67f9bd6d0a0120d7ce21cdc474b34c97b89319877fb355e9ea7454"
+fi
