@@ -41,6 +41,7 @@
 
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Outfit', 'Inter', sans-serif;
 }
 
 * {
@@ -56,6 +57,256 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LANDING PAGE — Nest-Inspired Ambient Splash Screen
+   ═══════════════════════════════════════════════════════════ */
+
+.landing-page {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(ellipse at 50% 40%, #0c1929 0%, #060d16 50%, #020508 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.landing-ambient-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.landing-glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.3;
+}
+
+.landing-glow-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(59,130,246,0.3) 0%, transparent 70%);
+  top: 20%;
+  left: 30%;
+  animation: glow-drift-1 8s ease-in-out infinite alternate;
+}
+
+.landing-glow-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(6,182,212,0.25) 0%, transparent 70%);
+  bottom: 10%;
+  right: 20%;
+  animation: glow-drift-2 10s ease-in-out infinite alternate;
+}
+
+.landing-glow-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%);
+  top: 50%;
+  left: 60%;
+  animation: glow-drift-3 12s ease-in-out infinite alternate;
+}
+
+@keyframes glow-drift-1 {
+  from { transform: translate(0, 0); }
+  to { transform: translate(40px, -30px); }
+}
+@keyframes glow-drift-2 {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-30px, 20px); }
+}
+@keyframes glow-drift-3 {
+  from { transform: translate(0, 0); }
+  to { transform: translate(20px, 40px); }
+}
+
+.landing-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Circular Dial */
+.landing-dial {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.landing-dial-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 40px rgba(59,130,246,0.2));
+}
+
+.landing-arc {
+  transition: stroke-dashoffset 2s ease-out;
+}
+
+.landing-temp-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.landing-temp-value {
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 300;
+  color: white;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.landing-temp-unit {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 300;
+  color: rgba(255,255,255,0.5);
+  margin-top: 8px;
+}
+
+.landing-dial-status {
+  position: absolute;
+  bottom: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: rgba(59,130,246,0.9);
+  text-transform: uppercase;
+}
+
+.landing-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59,130,246,0.6);
+  animation: status-pulse 2s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* Info Section */
+.landing-info {
+  text-align: center;
+}
+
+.landing-time {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: 0.05em;
+}
+
+.landing-date {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.35);
+  margin-top: 4px;
+}
+
+/* Branding */
+.landing-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.landing-brand-logo {
+  opacity: 0.7;
+}
+
+.landing-brand-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.landing-brand-tagline {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* CTA */
+.landing-cta {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  animation: cta-breathe 3s ease-in-out infinite;
+}
+
+.landing-cta-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(59,130,246,0.5);
+  animation: cta-dot-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cta-breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes cta-dot-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+  50% { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(59,130,246,0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB TRANSITIONS — GSAP-powered smooth crossfades
+   ═══════════════════════════════════════════════════════════ */
+
+.tab-content {
+  will-change: transform, opacity;
+}
+
+.main-container {
+  will-change: transform, opacity;
 }
 
 #app {
