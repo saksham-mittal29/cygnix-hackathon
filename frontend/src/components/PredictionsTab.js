@@ -382,7 +382,7 @@ export function renderPredictionsTab(state) {
         }
       }
 
-      container.querySelector("#m-battery-power").innerText = \`\${batteryStorage.toFixed(1)} kWh\`;
+      container.querySelector("#m-battery-power").innerText = `${batteryStorage.toFixed(1)} kWh`;
 
       const cygnixCost = gridPull > 0 ? (gridPull * 0.25) * (tariff / 100) : 0;
       let legacyCost = 0.0;
@@ -395,13 +395,13 @@ export function renderPredictionsTab(state) {
       cumulativeLegacyCost += legacyCost;
       const savings = cumulativeLegacyCost - cumulativeNeuralCost;
 
-      container.querySelector("#cost-legacy").innerText = \`$\${cumulativeLegacyCost.toFixed(3)}\`;
-      container.querySelector("#cost-neural").innerText = \`$\${cumulativeNeuralCost.toFixed(3)}\`;
-      container.querySelector("#cost-savings").innerText = \`$\${Math.max(0, savings).toFixed(3)}\`;
+      container.querySelector("#cost-legacy").innerText = `$${cumulativeLegacyCost.toFixed(3)}`;
+      container.querySelector("#cost-neural").innerText = `$${cumulativeNeuralCost.toFixed(3)}`;
+      container.querySelector("#cost-savings").innerText = `$${Math.max(0, savings).toFixed(3)}`;
 
       // Update Chart Data Arrays
       const elapsedMins = stepCount * 15;
-      const timeStr = elapsedMins === 0 ? "Now" : \`+\${elapsedMins}m\`;
+      const timeStr = elapsedMins === 0 ? "Now" : `+${elapsedMins}m`;
       chartLabels.push(timeStr);
       
       const temp = data.current_temp;
@@ -434,14 +434,14 @@ export function renderPredictionsTab(state) {
       container.querySelector("#action-explanation").innerText = data.explanation;
       container.querySelector("#action-explanation").style.borderLeftColor = badgeInfo.bg;
       
-      container.querySelector("#m-curr-temp").innerText = \`\${data.current_temp.toFixed(1)}°F\`;
-      container.querySelector("#m-pref-band").innerText = \`[\${pLow}, \${pHigh}]°F\`;
-      container.querySelector("#m-time").innerText = \`\${elapsedMins} min\`;
+      container.querySelector("#m-curr-temp").innerText = `${data.current_temp.toFixed(1)}°F`;
+      container.querySelector("#m-pref-band").innerText = `[${pLow}, ${pHigh}]°F`;
+      container.querySelector("#m-time").innerText = `${elapsedMins} min`;
 
       // Telemetry updates
-      logTelemetry(\`Action Selected: \${data.action} (\${hvacPower.toFixed(2)} kW)\`, true);
+      logTelemetry(`Action Selected: ${data.action} (${hvacPower.toFixed(2)} kW)`, true);
       if (cygnixCost < legacyCost) {
-        logTelemetry(\`Action avoided \${((legacyCost - cygnixCost)*100).toFixed(1)}¢ excess cost.\`);
+        logTelemetry(`Action avoided ${((legacyCost - cygnixCost)*100).toFixed(1)}¢ excess cost.`);
       }
 
       // Progress to next temp
@@ -449,7 +449,7 @@ export function renderPredictionsTab(state) {
 
     } catch (err) {
       console.warn("Simulation API call failed:", err);
-      logTelemetry(\`ERROR: \${err.message}\`, false);
+      logTelemetry(`ERROR: ${err.message}`, false);
       stopSimulation();
     }
   };
@@ -499,7 +499,7 @@ export function renderPredictionsTab(state) {
         stopSimulation();
         container.querySelector("#chart-status").innerText = "Completed";
         const savings = cumulativeLegacyCost - cumulativeNeuralCost;
-        logTelemetry(\`Simulation complete. Total savings: $\${savings.toFixed(3)}\`, true);
+        logTelemetry(`Simulation complete. Total savings: $${savings.toFixed(3)}`, true);
         
         // Log to Mini DB
         const pLow = container.querySelector('#pref-temp-low').value;
@@ -517,7 +517,7 @@ export function renderPredictionsTab(state) {
             time_of_day: tod,
             initial_temp: parseFloat(container.querySelector('#sim-curr-temp').value),
             outdoor_temp: parseFloat(container.querySelector('#sim-outdoor-temp').value),
-            target_band: \`[\${pLow}, \${pHigh}]\`,
+            target_band: `[${pLow}, ${pHigh}]`,
             solar_kw: parseFloat(container.querySelector('#sim-solar-kw').value),
             base_tariff: tariff,
             legacy_cost: cumulativeLegacyCost,
