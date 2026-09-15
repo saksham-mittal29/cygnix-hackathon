@@ -1,0 +1,11 @@
+{
+  "name": "horizon-frontend",
+  "version": "0.13.0",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 3000",
+    "start": "python3 -m http.server 3000"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
