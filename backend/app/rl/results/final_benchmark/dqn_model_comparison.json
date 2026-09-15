@@ -1,0 +1,36 @@
+{
+  "WISP_DQN_ORIGINAL": {
+    "comfort_violation_pct_mean": 41.37,
+    "avg_temp_deviation_mean": 0.467,
+    "max_temp_deviation_mean": 2.667,
+    "total_energy_kwh_mean": 62.5996,
+    "total_cost_mean": 270.2388,
+    "total_switches_mean": 48.55,
+    "cumulative_reward_mean": -494.8047,
+    "no_action_pct_mean": 8.8,
+    "cool_low_pct_mean": 0.0,
+    "cool_medium_pct_mean": 91.1,
+    "cool_high_pct_mean": 0.1,
+    "precool_pct_mean": 0.0,
+    "action_entropy_mean": 0.2199,
+    "unique_actions_mean": 1.8,
+    "consecutive_identical_pct_mean": 83.08
+  },
+  "WISP_DQN_LONG_TRAINED": {
+    "comfort_violation_pct_mean": 28.11,
+    "avg_temp_deviation_mean": 0.263,
+    "max_temp_deviation_mean": 2.473,
+    "total_energy_kwh_mean": 41.9398,
+    "total_cost_mean": 157.9974,
+    "total_switches_mean": 19.55,
+    "cumulative_reward_mean": -255.1007,
+    "no_action_pct_mean": 0.0,
+    "cool_low_pct_mean": 89.1,
+    "cool_medium_pct_mean": 4.1,
+    "cool_high_pct_mean": 0.0,
+    "precool_pct_mean": 3.6,
+    "action_entropy_mean": 0.3631,
+    "unique_actions_mean": 2.95,
+    "consecutive_identical_pct_mean": 93.19
+  }
+}
