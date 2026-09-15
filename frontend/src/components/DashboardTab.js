@@ -13,7 +13,7 @@ export function renderDashboardTab(state, setState) {
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 24px; border-radius: 8px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <h3 style="margin: 0 0 8px 0; color: #0f172a; font-size: 16px; font-weight: 600;">System Status: Automatic Mode</h3>
-            <p style="margin: 0; color: #475569; font-size: 14px;">The Predictive Engine is actively optimizing climate control.</p>
+            <p style="margin: 0; color: #475569; font-size: 14px;">System is running under predictive automation.</p>
           </div>
           <button class="btn" id="btn-stop-auto" style="background: white; border: 1px solid #cbd5e1; color: #0f172a; padding: 10px 16px; border-radius: 6px; font-weight: 500; cursor: pointer;">
             Manual Override
@@ -99,21 +99,21 @@ export function renderDashboardTab(state, setState) {
 
       ${systemModeHTML}
 
-      <!-- AI Navigation Routing Cards -->
+      <!-- Navigation Routing Cards -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
         
         <div class="nav-card" id="nav-sim" style="background: white; border: 1px solid #e2e8f0; padding: 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
           <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-            <span style="color: #2563eb;">▶</span> Interactive Simulation
+            Interactive Simulation
           </h3>
-          <p style="margin: 0; font-size: 13px; color: #64748b;">Run the Neural Prediction Engine with customizable weather, solar, and Time-of-Day inputs.</p>
+          <p style="margin: 0; font-size: 13px; color: #64748b;">Run local climate simulation with customizable weather, solar, and Time-of-Day inputs.</p>
         </div>
 
         <div class="nav-card" id="nav-live" style="background: white; border: 1px solid #e2e8f0; padding: 24px; border-radius: 8px; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
           <h3 style="margin: 0 0 8px 0; font-size: 16px; color: #0f172a; display: flex; align-items: center; gap: 8px;">
-            <span style="color: #10b981;">●</span> Live Sensor Stream
+            Live Sensor Stream
           </h3>
-          <p style="margin: 0; font-size: 13px; color: #64748b;">Initialize the AI engine using live telemetry data streaming from the local DHT22 Arduino sensor.</p>
+          <p style="margin: 0; font-size: 13px; color: #64748b;">Use live telemetry data streaming from the local DHT22 Arduino sensor.</p>
         </div>
 
       </div>
@@ -199,10 +199,10 @@ export function renderDashboardTab(state, setState) {
       const mode = container.querySelector("#manual-mode").value;
       const airflow = container.querySelector("#manual-airflow").value;
       
-      const newLog = {
+        const newLog = {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         level: "INFO",
-        tag: "[rl-agent]",
+        tag: "[system]",
         message: `User manual override detected. Parameters: ${temp}°F, ${mode}, ${airflow}`
       };
       
@@ -217,8 +217,8 @@ export function renderDashboardTab(state, setState) {
       const newLog = {
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         level: "INFO",
-        tag: "[rl-agent]",
-        message: `Returned to automatic control. Neural State-Space Engine engaged.`
+        tag: "[system]",
+        message: `Returned to automatic control.`
       };
       
       setState({ 

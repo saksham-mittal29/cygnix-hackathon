@@ -6,7 +6,7 @@ export function renderPredictionsTab(state) {
   let isSimulating = false;
   let simInterval = null;
   let simStepCount = 0;
-  const MAX_SIM_STEPS = 13;
+  const MAX_SIM_STEPS = 16;
 
   // Chart Data State
   let chartInstance = null;
@@ -31,7 +31,7 @@ export function renderPredictionsTab(state) {
   container.innerHTML = `
     <div class="page-header" style="margin-bottom: 20px;">
       <h1 class="page-title" style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0;">Live Thermostat Simulation</h1>
-      <div class="page-subtitle" style="font-size: 13px; color: #64748b;">Real-time AI Control Policy Dispatch & Trajectory</div>
+      <div class="page-subtitle" style="font-size: 13px; color: #64748b;">Real-time Control Policy Dispatch & Trajectory</div>
     </div>
     
     <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 30px;">
@@ -125,7 +125,7 @@ export function renderPredictionsTab(state) {
           <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0; margin-bottom: 12px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #166534; letter-spacing: 0.05em;" id="live-loc-title">Outdoor Weather (Open-Meteo)</span>
-              <button id="btn-detect-loc" type="button" style="background: #dcfce7; border: 1px solid #86efac; font-size: 10px; font-weight: 700; color: #15803d; cursor: pointer; padding: 3px 8px; border-radius: 4px;">📍 GPS Detect</button>
+              <button id="btn-detect-loc" type="button" style="background: #dcfce7; border: 1px solid #86efac; font-size: 10px; font-weight: 700; color: #15803d; cursor: pointer; padding: 3px 8px; border-radius: 4px;">GPS Detect</button>
             </div>
             <div style="display: flex; gap: 6px; margin-bottom: 8px;">
               <input type="text" id="live-city-input" placeholder="Enter city (e.g. Delhi, London, New York)" style="flex: 1; padding: 6px 8px; border-radius: 5px; border: 1px solid #86efac; font-size: 12px; background: white; color: #0f172a; outline: none;">
@@ -151,7 +151,7 @@ export function renderPredictionsTab(state) {
         </button>
 
         <div id="confidence-widget" style="text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
-          <h4 style="margin:0 0 4px 0; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase;">AI Model Confidence</h4>
+          <h4 style="margin:0 0 4px 0; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase;">Model Confidence</h4>
           <div style="font-size: 36px; font-weight: 800; color: #16a34a; line-height: 1;" id="conf-score">--%</div>
         </div>
       </div>
