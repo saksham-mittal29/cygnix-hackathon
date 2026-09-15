@@ -5,24 +5,24 @@ export const initialData = {
   
   zones: [
     {
-      id: "downstairs",
-      name: "Downstairs",
-      entityId: "climate.downstairs_2",
-      mode: "COOL",
+      id: "live_room",
+      name: "Live (Room)",
+      entityId: "climate.live_room",
+      mode: "COOLING",
       ambient: "70.0°F",
       setpoint: "70.0°F",
       cycle: "IDLE",
-      activeRooms: "0 / 1"
+      activeRooms: "1 / 1"
     },
     {
-      id: "upstairs",
-      name: "Upstairs",
-      entityId: "climate.upstairs_2",
-      mode: "COOLING",
+      id: "simulation",
+      name: "Simulation",
+      entityId: "climate.simulation",
+      mode: "IDLE",
       ambient: "71.0°F",
       setpoint: "71.0°F",
       cycle: "IDLE",
-      activeRooms: "0 / 6"
+      activeRooms: "1 / 1"
     }
   ],
 
@@ -227,28 +227,16 @@ export const initialData = {
 
   thermostats: [
     {
-      id: "downstairs_2",
-      name: "Downstairs Thermostat",
-      model: "Ecobee SmartThermostat",
-      zone: "Downstairs",
-      entity: "climate.downstairs_2",
+      id: "live_room",
+      name: "Live Room Thermostat",
+      model: "Custom DHT22 Rig",
+      zone: "Live (Room)",
+      entity: "climate.live_room",
       status: "Online",
       currentTemp: "70.0°F",
       targetTemp: "70.0°F",
       humidity: "42%",
-      firmware: "v4.7.5.3"
-    },
-    {
-      id: "upstairs_2",
-      name: "Upstairs Thermostat",
-      model: "Ecobee SmartThermostat",
-      zone: "Upstairs",
-      entity: "climate.upstairs_2",
-      status: "Online",
-      currentTemp: "71.0°F",
-      targetTemp: "71.0°F",
-      humidity: "46%",
-      firmware: "v4.7.5.3"
+      firmware: "v1.0"
     }
   ],
 

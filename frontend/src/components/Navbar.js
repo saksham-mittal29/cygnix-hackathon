@@ -1,11 +1,9 @@
 export function renderNavbar(activeTab, onTabChange, onOpenSettings) {
   const tabs = [
+    { id: "predictions", label: "Predictions" },
     { id: "dashboard", label: "Dashboard" },
-    { id: "rooms", label: "Rooms" },
-    { id: "schedules", label: "Schedules" },
     { id: "thermostats", label: "Thermostats" },
-    { id: "metrics", label: "Metrics" },
-    { id: "logs", label: "Logs" },
+    { id: "metrics", label: "Metrics" }
   ];
 
   const nav = document.createElement("nav");

@@ -1,53 +1,54 @@
-export function renderThermostatsTab(state) {
+export function renderThermostatsTab(state, setState) {
   const container = document.createElement("div");
   container.className = "tab-content thermostats-tab";
 
   container.innerHTML = `
     <div class="page-header">
       <div>
-        <h1 class="page-title">Thermostats</h1>
-        <div class="page-subtitle">Connected HVAC hardware controllers and zone assignments</div>
+        <h1 class="page-title">Hardware Terminals</h1>
+        <div class="page-subtitle">Connected physical HVAC controllers</div>
       </div>
-      <button class="btn btn-outline" id="btn-discover-thermostats">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        Discover devices
-      </button>
     </div>
 
-    <div class="zones-grid" style="max-width: 100%;">
+    <div class="zones-grid" style="max-width: 600px;">
       ${state.thermostats
         .map(
           (t) => `
-        <div class="zone-card">
-          <div class="zone-card-header">
+        <div class="zone-card thermostat-card" data-id="${t.id}" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+          <div class="zone-card-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px;">
             <div>
-              <h2 class="zone-title">${t.name}</h2>
-              <div class="zone-entity-id">${t.entity} · ${t.model}</div>
+              <h2 class="zone-title" style="margin: 0 0 4px 0; font-size: 16px; color: #0f172a; font-weight: 600;">${t.name}</h2>
+              <div class="zone-entity-id" style="font-size: 12px; color: #64748b; font-family: monospace;">${t.entity} · ${t.model}</div>
             </div>
-            <span class="badge badge-green">${t.status}</span>
+            <span style="font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
+              ${t.status}
+            </span>
           </div>
 
-          <div class="zone-stats-list">
-            <div class="zone-stat-row">
-              <span class="zone-stat-label">Assigned Zone</span>
-              <span class="zone-stat-value">${t.zone}</span>
+          <div class="zone-stats-list" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="zone-stat-row" style="display: flex; justify-content: space-between; font-size: 14px;">
+              <span class="zone-stat-label" style="color: #64748b;">Assigned Zone</span>
+              <span class="zone-stat-value" style="font-weight: 500; color: #0f172a;">${t.zone}</span>
             </div>
-            <div class="zone-stat-row">
-              <span class="zone-stat-label">Current Reading</span>
-              <span class="zone-stat-value">${t.currentTemp}</span>
+            <div class="zone-stat-row" style="display: flex; justify-content: space-between; font-size: 14px;">
+              <span class="zone-stat-label" style="color: #64748b;">Current Reading</span>
+              <span class="zone-stat-value" style="font-weight: 500; color: #0f172a;">${t.currentTemp}</span>
             </div>
-            <div class="zone-stat-row">
-              <span class="zone-stat-label">Target Setpoint</span>
-              <span class="zone-stat-value">${t.targetTemp}</span>
+            <div class="zone-stat-row" style="display: flex; justify-content: space-between; font-size: 14px;">
+              <span class="zone-stat-label" style="color: #64748b;">Target Setpoint</span>
+              <span class="zone-stat-value" style="font-weight: 500; color: #0f172a;">${t.targetTemp}</span>
             </div>
-            <div class="zone-stat-row">
-              <span class="zone-stat-label">Relative Humidity</span>
-              <span class="zone-stat-value">${t.humidity}</span>
+            <div class="zone-stat-row" style="display: flex; justify-content: space-between; font-size: 14px;">
+              <span class="zone-stat-label" style="color: #64748b;">Relative Humidity</span>
+              <span class="zone-stat-value" style="font-weight: 500; color: #0f172a;">${t.humidity}</span>
             </div>
-            <div class="zone-stat-row">
-              <span class="zone-stat-label">Firmware</span>
-              <span class="cycle-badge">${t.firmware}</span>
+            <div class="zone-stat-row" style="display: flex; justify-content: space-between; font-size: 14px;">
+              <span class="zone-stat-label" style="color: #64748b;">Firmware</span>
+              <span class="zone-stat-value" style="font-weight: 500; font-family: monospace; font-size: 12px; background: #f8fafc; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">${t.firmware}</span>
             </div>
+          </div>
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9; text-align: center; color: #2563eb; font-size: 13px; font-weight: 600;">
+            Click to launch Prediction Engine &rarr;
           </div>
         </div>
       `
@@ -55,6 +56,23 @@ export function renderThermostatsTab(state) {
         .join("")}
     </div>
   `;
+
+  // Add hover effects and click listeners
+  container.querySelectorAll('.thermostat-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'translateY(-2px)';
+      card.style.boxShadow = '0 10px 15px -3px rgb(0 0 0 / 0.1)';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'translateY(0)';
+      card.style.boxShadow = 'none';
+    });
+    card.addEventListener('click', () => {
+      if (setState) {
+        setState({ activeTab: 'predictions' });
+      }
+    });
+  });
 
   return container;
 }
