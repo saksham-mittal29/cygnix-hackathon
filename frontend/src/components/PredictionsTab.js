@@ -18,13 +18,15 @@ export function renderPredictionsTab(state) {
   // Cost Data State
   let cumulativeNeuralCost = 0.0;
   let cumulativeLegacyCost = 0.0;
+  let batteryStorage = 0.0;
 
   const initialTemp = 76.5;
   const initialPrefLow = 70.0;
   const initialPrefHigh = 74.0;
   const initialOutdoor = 82.0;
-  const initialSolar = 0.0;
-  const initialTariff = 10.0;
+  const initialSolar = 2.5;
+
+  const initialSource = state.predictionSource || "simulation";
 
   container.innerHTML = `
     <div class="page-header" style="margin-bottom: 20px;">
@@ -39,17 +41,17 @@ export function renderPredictionsTab(state) {
         
         <div style="display: flex; gap: 16px; margin-bottom: 18px;">
           <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #334155;">
-            <input type="radio" name="pred-source" value="simulation" checked style="accent-color: #2563eb; width: 16px; height: 16px;">
+            <input type="radio" name="pred-source" value="simulation" ${initialSource === 'simulation' ? 'checked' : ''} style="accent-color: #2563eb; width: 16px; height: 16px;">
             Interactive Demo Mode
           </label>
           <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: #334155;">
-            <input type="radio" name="pred-source" value="live" style="accent-color: #2563eb; width: 16px; height: 16px;">
+            <input type="radio" name="pred-source" value="live" ${initialSource === 'live' ? 'checked' : ''} style="accent-color: #2563eb; width: 16px; height: 16px;">
             Live Sensor (DHT22)
           </label>
         </div>
 
         <!-- Simulation Inputs -->
-        <div id="sim-inputs" style="display: block;">
+        <div id="sim-inputs" style="display: ${initialSource === 'simulation' ? 'block' : 'none'};">
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
             <div>
               <label style="display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px;">Initial Temp (°F)</label>
@@ -81,14 +83,19 @@ export function renderPredictionsTab(state) {
               <input type="number" id="sim-solar-kw" value="${initialSolar}" step="0.5" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; box-sizing: border-box;">
             </div>
             <div>
-              <label style="display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px;">Tariff (¢/kWh)</label>
-              <input type="number" id="sim-tariff-rate" value="${initialTariff}" step="1" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; box-sizing: border-box;">
+              <label style="display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px;">Time of Day</label>
+              <select id="sim-tod" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; box-sizing: border-box;">
+                <option value="Morning">Morning (Mid-Peak)</option>
+                <option value="Afternoon" selected>Afternoon (Super Peak)</option>
+                <option value="Night">Night (Mid-Peak)</option>
+                <option value="Midnight">Midnight (Off-Peak)</option>
+              </select>
             </div>
           </div>
         </div>
 
         <!-- Live Inputs -->
-        <div id="live-inputs" style="display: none;">
+        <div id="live-inputs" style="display: ${initialSource === 'live' ? 'block' : 'none'};">
           <div style="background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 12px;">
             <span style="font-size: 11px; color: #64748b;">Arduino DHT22 Sensor Live Telemetry</span>
           </div>
@@ -156,8 +163,8 @@ export function renderPredictionsTab(state) {
               <div style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 4px;" id="m-curr-temp">--°F</div>
             </div>
             <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
-              <div style="font-size: 11px; color: #64748b; font-weight: 600;">HVAC Power</div>
-              <div style="font-size: 20px; font-weight: 700; color: #0284c7; margin-top: 4px;" id="m-hvac-power">0.00 kW</div>
+              <div style="font-size: 11px; color: #64748b; font-weight: 600;">Battery</div>
+              <div style="font-size: 20px; font-weight: 700; color: #059669; margin-top: 4px;" id="m-battery-power">0.0 kWh</div>
             </div>
             <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
               <div style="font-size: 11px; color: #64748b; font-weight: 600;">Comfort Target</div>
@@ -309,9 +316,19 @@ export function renderPredictionsTab(state) {
     const pHigh = parseFloat(container.querySelector('#pref-temp-high').value) || 74.0;
     const outTemp = parseFloat(container.querySelector('#sim-outdoor-temp').value) || 82.0;
     const solKw = parseFloat(container.querySelector('#sim-solar-kw').value) || 0.0;
-    const tariff = parseFloat(container.querySelector('#sim-tariff-rate').value) || 10.0;
+    const tod = container.querySelector('#sim-tod').value;
     const mode = container.querySelector('input[name="pred-source"]:checked')?.value || 'simulation';
     
+    // ToD Logic
+    let tariff = 10.0;
+    let isDay = true;
+    if (tod === 'Midnight') { tariff = 3.0; isDay = false; }
+    else if (tod === 'Morning') { tariff = 10.0; isDay = true; }
+    else if (tod === 'Afternoon') { tariff = 25.0; isDay = true; }
+    else if (tod === 'Night') { tariff = 10.0; isDay = false; }
+    
+    let activeSolar = isDay ? solKw : 0.0;
+
     let currHum = 50.0;
     if (mode === 'live' && stepCount === 0) {
       simulatedCurrentTemp = parseFloat(container.querySelector('#live-curr-temp').value) || 75.2;
@@ -334,7 +351,7 @@ export function renderPredictionsTab(state) {
           outdoor_temp: outTemp,
           preferred_temp_low: pLow,
           preferred_temp_high: pHigh,
-          solar_kw: solKw,
+          solar_kw: activeSolar,
           tariff_rate: tariff,
           mode: "COOLING"
         })
@@ -343,24 +360,48 @@ export function renderPredictionsTab(state) {
       if (!response.ok) throw new Error("API responded with " + response.status);
       const data = await response.json();
       
-      // Compute Cost Savings
-      const cygnixCost = data.estimated_cost;
+      // Compute Battery & Cost Savings
+      const hvacPower = data.hvac_power_kw !== undefined ? data.hvac_power_kw : (data.action && data.action.includes("COOL") ? 1.75 : 0.0);
+      let gridPull = 0.0;
+
+      if (activeSolar > hvacPower) {
+        const excess = activeSolar - hvacPower;
+        batteryStorage = Math.min(13.5, batteryStorage + excess);
+        logTelemetry(`Charging battery with ${excess.toFixed(2)}kW excess solar`);
+      } else {
+        let deficit = hvacPower - activeSolar;
+        if (batteryStorage >= deficit) {
+          batteryStorage -= deficit;
+          if (deficit > 0) logTelemetry(`Discharging battery to cover ${deficit.toFixed(2)}kW load`);
+        } else {
+          gridPull = deficit - batteryStorage;
+          batteryStorage = 0;
+          if (deficit > 0) {
+            logTelemetry(`Battery depleted. Pulling ${gridPull.toFixed(2)}kW from grid at ${tariff}¢/kWh.`);
+          }
+        }
+      }
+
+      container.querySelector("#m-battery-power").innerText = \`\${batteryStorage.toFixed(1)} kWh\`;
+
+      const cygnixCost = gridPull > 0 ? (gridPull * 0.25) * (tariff / 100) : 0;
       let legacyCost = 0.0;
       if (simulatedCurrentTemp > pHigh || data.action.includes('COOL')) {
-        legacyCost = cygnixCost > 0 ? cygnixCost * (1.2 + Math.random() * 0.3) : ((3.5 * 0.25) * (tariff / 100));
+        let legacyDeficit = Math.max(0, 3.5 - activeSolar);
+        legacyCost = (legacyDeficit * 0.25) * (tariff / 100);
       }
       
       cumulativeNeuralCost += cygnixCost;
       cumulativeLegacyCost += legacyCost;
       const savings = cumulativeLegacyCost - cumulativeNeuralCost;
 
-      container.querySelector("#cost-legacy").innerText = `$${cumulativeLegacyCost.toFixed(3)}`;
-      container.querySelector("#cost-neural").innerText = `$${cumulativeNeuralCost.toFixed(3)}`;
-      container.querySelector("#cost-savings").innerText = `$${Math.max(0, savings).toFixed(3)}`;
+      container.querySelector("#cost-legacy").innerText = \`$\${cumulativeLegacyCost.toFixed(3)}\`;
+      container.querySelector("#cost-neural").innerText = \`$\${cumulativeNeuralCost.toFixed(3)}\`;
+      container.querySelector("#cost-savings").innerText = \`$\${Math.max(0, savings).toFixed(3)}\`;
 
       // Update Chart Data Arrays
       const elapsedMins = stepCount * 15;
-      const timeStr = elapsedMins === 0 ? "Now" : `+${elapsedMins}m`;
+      const timeStr = elapsedMins === 0 ? "Now" : \`+\${elapsedMins}m\`;
       chartLabels.push(timeStr);
       
       const temp = data.current_temp;
@@ -393,16 +434,14 @@ export function renderPredictionsTab(state) {
       container.querySelector("#action-explanation").innerText = data.explanation;
       container.querySelector("#action-explanation").style.borderLeftColor = badgeInfo.bg;
       
-      container.querySelector("#m-curr-temp").innerText = `${data.current_temp.toFixed(1)}°F`;
-      const hvacPower = data.hvac_power_kw !== undefined ? data.hvac_power_kw : (data.action && data.action.includes("COOL") ? 1.75 : 0.0);
-      container.querySelector("#m-hvac-power").innerText = `${hvacPower.toFixed(2)} kW`;
-      container.querySelector("#m-pref-band").innerText = `[${pLow}, ${pHigh}]°F`;
-      container.querySelector("#m-time").innerText = `${elapsedMins} min`;
+      container.querySelector("#m-curr-temp").innerText = \`\${data.current_temp.toFixed(1)}°F\`;
+      container.querySelector("#m-pref-band").innerText = \`[\${pLow}, \${pHigh}]°F\`;
+      container.querySelector("#m-time").innerText = \`\${elapsedMins} min\`;
 
       // Telemetry updates
-      logTelemetry(`Action Selected: ${data.action} (${hvacPower.toFixed(2)} kW)`, true);
+      logTelemetry(\`Action Selected: \${data.action} (\${hvacPower.toFixed(2)} kW)\`, true);
       if (cygnixCost < legacyCost) {
-        logTelemetry(`Action avoided ${((legacyCost - cygnixCost)*100).toFixed(1)}¢ excess cost.`);
+        logTelemetry(\`Action avoided \${((legacyCost - cygnixCost)*100).toFixed(1)}¢ excess cost.\`);
       }
 
       // Progress to next temp
@@ -410,7 +449,7 @@ export function renderPredictionsTab(state) {
 
     } catch (err) {
       console.warn("Simulation API call failed:", err);
-      logTelemetry(`ERROR: ${err.message}`, false);
+      logTelemetry(\`ERROR: \${err.message}\`, false);
       stopSimulation();
     }
   };
@@ -437,9 +476,11 @@ export function renderPredictionsTab(state) {
     lowerBoundData = [];
     cumulativeNeuralCost = 0.0;
     cumulativeLegacyCost = 0.0;
+    batteryStorage = 0.0;
+    
     container.querySelector('#telemetry-feed').innerHTML = '';
-    const hvacEl = container.querySelector('#m-hvac-power');
-    if (hvacEl) hvacEl.innerText = '0.00 kW';
+    const batEl = container.querySelector('#m-battery-power');
+    if (batEl) batEl.innerText = '0.0 kWh';
     
     if (chartInstance) chartInstance.destroy();
     initChart();
@@ -457,7 +498,35 @@ export function renderPredictionsTab(state) {
       if (simStepCount >= MAX_SIM_STEPS) {
         stopSimulation();
         container.querySelector("#chart-status").innerText = "Completed";
-        logTelemetry(`Simulation complete. Total savings: $${(cumulativeLegacyCost - cumulativeNeuralCost).toFixed(3)}`, true);
+        const savings = cumulativeLegacyCost - cumulativeNeuralCost;
+        logTelemetry(\`Simulation complete. Total savings: $\${savings.toFixed(3)}\`, true);
+        
+        // Log to Mini DB
+        const pLow = container.querySelector('#pref-temp-low').value;
+        const pHigh = container.querySelector('#pref-temp-high').value;
+        const tod = container.querySelector('#sim-tod').value;
+        let tariff = 10.0;
+        if (tod === 'Midnight') tariff = 3.0;
+        else if (tod === 'Afternoon') tariff = 25.0;
+
+        fetch("http://localhost:8000/api/log_simulation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            timestamp: new Date().toLocaleTimeString(),
+            time_of_day: tod,
+            initial_temp: parseFloat(container.querySelector('#sim-curr-temp').value),
+            outdoor_temp: parseFloat(container.querySelector('#sim-outdoor-temp').value),
+            target_band: \`[\${pLow}, \${pHigh}]\`,
+            solar_kw: parseFloat(container.querySelector('#sim-solar-kw').value),
+            base_tariff: tariff,
+            legacy_cost: cumulativeLegacyCost,
+            neural_cost: cumulativeNeuralCost,
+            total_savings: savings > 0 ? savings : 0,
+            actions_taken: []
+          })
+        }).catch(err => console.error("Failed to log simulation", err));
+
         return;
       }
       performSimulationStep(simStepCount);
