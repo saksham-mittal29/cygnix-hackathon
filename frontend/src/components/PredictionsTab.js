@@ -67,7 +67,15 @@ export function renderPredictionsTab(state) {
           </div>
 
           <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 14px;">
-            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 8px;">Comfort Target Band</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b;">Comfort Target Band</div>
+              <select id="sim-autopilot-profile" style="font-size: 10px; padding: 2px 4px; border-radius: 4px; border: 1px solid #cbd5e1; background: white; cursor: pointer; color: #2563eb; font-weight: 700;">
+                <option value="custom">Autopilot: Off (Manual)</option>
+                <option value="profile_a" selected>Autopilot: User A (70°-74°F)</option>
+                <option value="profile_b">Autopilot: Cold Sleeper (66°-70°F)</option>
+                <option value="profile_c">Autopilot: Eco Saver (74°-78°F)</option>
+              </select>
+            </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
               <div>
                 <label style="display: block; font-size: 11px; color: #475569; margin-bottom: 4px;">Low Bound (°F)</label>
@@ -220,6 +228,30 @@ export function renderPredictionsTab(state) {
       }
     });
   });
+
+  // Autopilot Logic
+  const autopilotSelect = container.querySelector('#sim-autopilot-profile');
+  const lowBoundInput = container.querySelector('#pref-temp-low');
+  const highBoundInput = container.querySelector('#pref-temp-high');
+
+  if (autopilotSelect) {
+    autopilotSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'profile_a') {
+        lowBoundInput.value = 70;
+        highBoundInput.value = 74;
+      } else if (e.target.value === 'profile_b') {
+        lowBoundInput.value = 66;
+        highBoundInput.value = 70;
+      } else if (e.target.value === 'profile_c') {
+        lowBoundInput.value = 74;
+        highBoundInput.value = 78;
+      }
+    });
+    
+    // Switch to manual if user manually edits bounds
+    lowBoundInput.addEventListener('input', () => autopilotSelect.value = 'custom');
+    highBoundInput.addEventListener('input', () => autopilotSelect.value = 'custom');
+  }
 
   const btnFetch = container.querySelector('#btn-fetch-meteo');
   if (btnFetch) {
