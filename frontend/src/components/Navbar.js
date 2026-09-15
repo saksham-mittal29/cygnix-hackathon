@@ -10,7 +10,7 @@ export function renderNavbar(activeTab, onTabChange, onOpenSettings) {
   nav.className = "navbar";
 
   nav.innerHTML = `
-    <div class="nav-brand" id="brand-logo" title="Cygnix AI Climate Control">
+    <div class="nav-brand" id="brand-logo" title="Horizon Smart Climate Control">
       <div class="nav-logo-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="12" cy="12" r="5" stroke="#2563eb" stroke-width="2" stroke-dasharray="16 16"/>
@@ -18,7 +18,7 @@ export function renderNavbar(activeTab, onTabChange, onOpenSettings) {
           <path d="M7 19h10" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <span class="brand-name">Cygnix</span>
+      <span class="brand-name">Horizon</span>
     </div>
 
     <div class="nav-tabs">
