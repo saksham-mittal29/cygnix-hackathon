@@ -11,8 +11,9 @@ export class App {
     this.root = rootElement;
     this.state = {
       ...initialData,
-      activeTab: "predictions",
+      activeTab: "dashboard",
       selectedThermostat: "all",
+      predictionSource: "simulation", // "simulation" | "live"
       systemMode: "automatic", // "automatic" | "manual_pending" | "manual"
       manualSettings: { temp: 70, mode: "COOLING", airflow: "Auto" }
     };

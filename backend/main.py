@@ -244,6 +244,50 @@ def predict(req: PredictRequest):
     }
 
 
+class LogSimulationRequest(BaseModel):
+    timestamp: str
+    time_of_day: str
+    initial_temp: float
+    outdoor_temp: float
+    target_band: str
+    solar_kw: float
+    base_tariff: float
+    legacy_cost: float
+    neural_cost: float
+    total_savings: float
+    actions_taken: list
+
+@app.post("/api/log_simulation")
+def log_simulation(req: LogSimulationRequest):
+    logs_path = Path(__file__).parent / "data" / "processed" / "simulation_logs.json"
+    logs = []
+    if logs_path.exists():
+        with open(logs_path, "r") as f:
+            try:
+                logs = json.load(f)
+            except json.JSONDecodeError:
+                logs = []
+    
+    logs.insert(0, req.model_dump()) # Prepend latest
+    # Keep last 50
+    logs = logs[:50]
+    
+    with open(logs_path, "w") as f:
+        json.dump(logs, f, indent=2)
+        
+    return {"status": "success"}
+
+@app.get("/api/sim_logs")
+def get_sim_logs():
+    logs_path = Path(__file__).parent / "data" / "processed" / "simulation_logs.json"
+    if logs_path.exists():
+        with open(logs_path, "r") as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return []
+    return []
+
 @app.get("/api/metrics")
 def get_metrics():
     metrics_path = Path(__file__).parent / "data" / "processed" / "metrics.json"
