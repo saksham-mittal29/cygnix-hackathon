@@ -1,0 +1,28 @@
+[
+  {
+    "timestamp": "23:06:29",
+    "time_of_day": "Afternoon",
+    "initial_temp": 83.0,
+    "outdoor_temp": 90.0,
+    "target_band": "[70, 74]",
+    "solar_kw": 2.5,
+    "base_tariff": 25.0,
+    "legacy_cost": 0.8125,
+    "neural_cost": 0.0,
+    "total_savings": 0.8125,
+    "actions_taken": []
+  },
+  {
+    "timestamp": "23:05:35",
+    "time_of_day": "Afternoon",
+    "initial_temp": 76.5,
+    "outdoor_temp": 82.0,
+    "target_band": "[70, 74]",
+    "solar_kw": 2.5,
+    "base_tariff": 25.0,
+    "legacy_cost": 0.8125,
+    "neural_cost": 0.515,
+    "total_savings": 0.2975,
+    "actions_taken": []
+  }
+]

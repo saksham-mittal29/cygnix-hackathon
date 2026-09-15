@@ -1,0 +1,7 @@
+Horizon (min),Variable,MAE,RMSE
+5,Temperature,0.17673603,0.4306835
+5,Humidity,0.31963286,0.6869862
+15,Temperature,0.3969498,0.7075825
+15,Humidity,0.60075074,1.103189
+30,Temperature,0.51067084,0.872961
+30,Humidity,0.73309016,1.3126701

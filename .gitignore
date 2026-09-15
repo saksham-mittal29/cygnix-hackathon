@@ -16,3 +16,4 @@ ecobee.processed/
 *.rar
 *.npy
 backend/models/saved_models/*.npy
+*.parquet
