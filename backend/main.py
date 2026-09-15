@@ -25,8 +25,15 @@ from backend.app.prediction.neural_engine import NeuralPredictionEngine
 from backend.app.rl.agent import DQNAgent
 from backend.app.rl.observation import extract_dqn_observation
 from backend.app.simulation.environment import WispEnvState
+from backend.app.sensor.dht22_reader import dht22_sensor
 
 logger = logging.getLogger("wisp.api")
+
+# Start USB DHT22 sensor background listener
+try:
+    dht22_sensor.start()
+except Exception as e:
+    logger.warning(f"Could not start DHT22 listener: {e}")
 
 app = FastAPI(title="Wisp Climate Control API")
 
@@ -295,3 +302,18 @@ def get_metrics():
         with open(metrics_path, "r") as f:
             return json.load(f)
     return {"error": "Metrics not generated yet."}
+
+
+@app.get("/api/live/sensor")
+def get_live_sensor(lat: Optional[float] = None, lon: Optional[float] = None, loc: Optional[str] = None):
+    """Returns real-time indoor room readings from USB DHT22 and outdoor weather from Open-Meteo for the specified location."""
+    return dht22_sensor.get_live_readings(lat=lat, lon=lon, location_name=loc)
+
+
+@app.post("/api/live/toggle")
+def toggle_live_sensor(active: bool = True):
+    """Start or stop active USB serial port reading."""
+    dht22_sensor.set_monitoring(active)
+    return {"status": "ok", "monitoring_active": active}
+
+
