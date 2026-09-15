@@ -150,10 +150,14 @@ export function renderPredictionsTab(state) {
           </div>
 
           <!-- Key Metrics Grid -->
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
             <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
               <div style="font-size: 11px; color: #64748b; font-weight: 600;">Current Temp</div>
               <div style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 4px;" id="m-curr-temp">--°F</div>
+            </div>
+            <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+              <div style="font-size: 11px; color: #64748b; font-weight: 600;">HVAC Power</div>
+              <div style="font-size: 20px; font-weight: 700; color: #0284c7; margin-top: 4px;" id="m-hvac-power">0.00 kW</div>
             </div>
             <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
               <div style="font-size: 11px; color: #64748b; font-weight: 600;">Comfort Target</div>
@@ -390,11 +394,13 @@ export function renderPredictionsTab(state) {
       container.querySelector("#action-explanation").style.borderLeftColor = badgeInfo.bg;
       
       container.querySelector("#m-curr-temp").innerText = `${data.current_temp.toFixed(1)}°F`;
+      const hvacPower = data.hvac_power_kw !== undefined ? data.hvac_power_kw : (data.action && data.action.includes("COOL") ? 1.75 : 0.0);
+      container.querySelector("#m-hvac-power").innerText = `${hvacPower.toFixed(2)} kW`;
       container.querySelector("#m-pref-band").innerText = `[${pLow}, ${pHigh}]°F`;
       container.querySelector("#m-time").innerText = `${elapsedMins} min`;
 
       // Telemetry updates
-      logTelemetry(`Action Selected: ${data.action}`, true);
+      logTelemetry(`Action Selected: ${data.action} (${hvacPower.toFixed(2)} kW)`, true);
       if (cygnixCost < legacyCost) {
         logTelemetry(`Action avoided ${((legacyCost - cygnixCost)*100).toFixed(1)}¢ excess cost.`);
       }
@@ -432,6 +438,8 @@ export function renderPredictionsTab(state) {
     cumulativeNeuralCost = 0.0;
     cumulativeLegacyCost = 0.0;
     container.querySelector('#telemetry-feed').innerHTML = '';
+    const hvacEl = container.querySelector('#m-hvac-power');
+    if (hvacEl) hvacEl.innerText = '0.00 kW';
     
     if (chartInstance) chartInstance.destroy();
     initChart();
