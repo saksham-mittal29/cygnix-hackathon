@@ -173,6 +173,33 @@ def predict(req: PredictRequest):
         "REDUCE_HVAC": round(float(q_vals[5]), 4),
     }
 
+    # --- OOD Safety Guardrail: Model Predictive Control (MPC) Fallback ---
+    # If confidence is below 70%, the DQN policy is operating out-of-distribution (e.g. 89°F Indian climate)
+    # and its Q-values cannot be trusted. We degrade gracefully to MPC using the physics engine.
+    if baseline_pred.confidence < 0.70:
+        best_action = action
+        best_penalty = float('inf')
+        
+        # Test all actions through the physics-blended engine
+        for test_act in WispAction:
+            test_pred = engine.predict(thermal_curr, test_act, dist)
+            # Evaluate penalty at t=30
+            if test_pred.temp_t30 > p_high:
+                pen = test_pred.temp_t30 - p_high
+            elif test_pred.temp_t30 < p_low:
+                pen = p_low - test_pred.temp_t30
+            else:
+                pen = 0.0
+            
+            # Add a tiny tie-breaker to prefer cheaper actions if penalties are equal
+            pen += get_cooling_intensity(test_act) * 0.01
+            
+            if pen < best_penalty:
+                best_penalty = pen
+                best_action = test_act
+                
+        action = best_action
+
     # 4. Predict Trajectory Under the Selected Action
     active_pred = engine.predict(thermal_curr, action, dist)
 

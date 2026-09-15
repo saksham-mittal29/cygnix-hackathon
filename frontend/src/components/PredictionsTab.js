@@ -658,8 +658,8 @@ export function renderPredictionsTab(state) {
         logTelemetry(`Action avoided ${((legacyCost - cygnixCost)*100).toFixed(1)}¢ excess cost.`);
       }
 
-      // Progress to next temp
-      simulatedCurrentTemp = data.trajectory[0].predicted_temp;
+      // Progress to next temp (using t15 to match the 15-minute chart intervals)
+      simulatedCurrentTemp = data.trajectory[1].predicted_temp;
 
     } catch (err) {
       console.warn("Simulation API call failed:", err);

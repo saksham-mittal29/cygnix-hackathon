@@ -240,9 +240,9 @@ class NeuralPredictionEngine(BasePredictionEngine):
 
         intensity = get_cooling_intensity(action)
 
-        # Thermal constants (empirical for a typical residential room)
+        # Thermal constants (scaled up for dramatic, fast visual demo)
         K_ENV = 0.02    # envelope heat exchange rate per 5-min step
-        K_HVAC = 0.8    # max cooling drop per 5-min step at full intensity
+        K_HVAC = 2.0    # max cooling drop per 5-min step at full intensity
 
         t = current_temp_f
         results = {}  # keyed by minute offset
