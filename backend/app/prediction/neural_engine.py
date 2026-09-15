@@ -219,22 +219,67 @@ class NeuralPredictionEngine(BasePredictionEngine):
 
         return hist_s_t, hist_a_t, hist_d_t
 
+    @staticmethod
+    def _physics_fallback(
+        current_temp_f: float,
+        outdoor_temp_f: float,
+        action: 'WispAction',
+        current_humidity: float,
+    ) -> dict:
+        """
+        First-principles thermal model based on Newton's Law of Cooling.
+        Used as a fallback when the neural network encounters out-of-distribution inputs
+        (e.g., Indian climate temperatures fed to a US-trained model).
+
+        Physics:
+          dT/dt = -k_env * (T_indoor - T_outdoor) - k_hvac * cooling_intensity
+          where k_env ~ 0.15 °F per 5-min per °F delta (building envelope leakage)
+          and k_hvac ~ 0.8 °F per 5-min at full intensity (3.5 kW compressor)
+        """
+        from backend.app.core.actions import get_cooling_intensity
+
+        intensity = get_cooling_intensity(action)
+
+        # Thermal constants (empirical for a typical residential room)
+        K_ENV = 0.02    # envelope heat exchange rate per 5-min step
+        K_HVAC = 0.8    # max cooling drop per 5-min step at full intensity
+
+        t = current_temp_f
+        results = {}  # keyed by minute offset
+
+        # Simulate 6 steps of 5 minutes each (total 30 minutes)
+        for i in range(1, 7):
+            # Newton's law: drift toward outdoor temp
+            env_drift = K_ENV * (outdoor_temp_f - t)
+            # HVAC active cooling
+            hvac_cooling = K_HVAC * intensity
+            t = t + env_drift - hvac_cooling
+
+            minute = i * 5
+            if minute in (5, 15, 30):
+                # Humidity drifts slightly toward 50% (simplified)
+                hum = current_humidity + (50.0 - current_humidity) * 0.02 * i
+                results[minute] = {
+                    "temp": round(t, 2),
+                    "hum": round(float(np.clip(hum, 0.0, 100.0)), 2),
+                }
+
+        return {
+            "temp_t5": results[5]["temp"],   "hum_t5": results[5]["hum"],
+            "temp_t15": results[15]["temp"], "hum_t15": results[15]["hum"],
+            "temp_t30": results[30]["temp"], "hum_t30": results[30]["hum"],
+        }
+
     def predict(
         self,
         current_thermal: ThermalState,
-        action: WispAction,
+        action: 'WispAction',
         disturbance: Disturbance,
     ) -> PredictionResult:
         """
         Executes real inference using Person 2's NeuralStateSpaceModel with inverse scaling.
-        
-        Args:
-            current_thermal: Current indoor thermal conditions.
-            action: Candidate control action.
-            disturbance: Exogenous weather & diurnal conditions.
-
-        Returns:
-            PredictionResult with +5, +15, +30 minute forecasts and conformal confidence.
+        When inputs are out-of-distribution (OOD), blends neural predictions with a
+        first-principles physics fallback to maintain correct cooling behavior.
         """
         # 1. Feature Encoding with Standardization
         heat_sp = getattr(current_thermal, "heat_setpoint", self.default_heat_setpoint_f)
@@ -262,6 +307,31 @@ class NeuralPredictionEngine(BasePredictionEngine):
         raw_t30 = float(preds_z[4] * T_IN_STD + T_IN_MEAN)
         raw_h30 = float(preds_z[5] * H_IN_STD + H_IN_MEAN)
 
+        # ---- OOD Detection & Physics Blending ----
+        t_in = float(current_thermal.indoor_temperature)
+        t_out = float(disturbance.outdoor_temperature)
+        curr_hum = float(current_thermal.indoor_humidity)
+
+        in_ood = abs(t_in - T_IN_MEAN) / T_IN_STD   # how many std devs away
+        out_ood = abs(t_out - T_OUT_MEAN) / T_OUT_STD
+
+        # Blend weight: 0.0 = fully neural, 1.0 = fully physics
+        # Kicks in when indoor z-score > 2.0 (i.e., temp > ~75°F or < ~61°F)
+        max_ood = max(in_ood, out_ood)
+        if max_ood > 2.0:
+            blend = min(1.0, (max_ood - 2.0) / 3.0)  # linear ramp from 0 at z=2 to 1.0 at z=5
+        else:
+            blend = 0.0
+
+        if blend > 0.0:
+            phys = self._physics_fallback(t_in, t_out, action, curr_hum)
+            raw_t5  = (1.0 - blend) * raw_t5  + blend * phys["temp_t5"]
+            raw_t15 = (1.0 - blend) * raw_t15 + blend * phys["temp_t15"]
+            raw_t30 = (1.0 - blend) * raw_t30 + blend * phys["temp_t30"]
+            raw_h5  = (1.0 - blend) * raw_h5  + blend * phys["hum_t5"]
+            raw_h15 = (1.0 - blend) * raw_h15 + blend * phys["hum_t15"]
+            raw_h30 = (1.0 - blend) * raw_h30 + blend * phys["hum_t30"]
+
         # Bounded to physical valid domains
         temp_t5 = float(raw_t5)
         hum_t5 = float(np.clip(raw_h5, 0.0, 100.0))
@@ -273,10 +343,9 @@ class NeuralPredictionEngine(BasePredictionEngine):
         # 5. Conformal Confidence Score [0.0, 1.0]
         base_confidence_pct = self.aci.get_confidence_score()
         
-        # Add dynamic OOD (Out of Distribution) penalty based on outdoor weather extremeness
-        # T_OUT_MEAN is 43.0, STD is 15.16
-        t_out = float(disturbance.outdoor_temperature)
-        ood_penalty = min(15.0, abs(t_out - T_OUT_MEAN) / T_OUT_STD * 2.5) 
+        # OOD penalty: combined indoor + outdoor extremeness
+        total_ood = (out_ood + (in_ood * 2.0)) * 2.5 
+        ood_penalty = min(50.0, total_ood)
         
         # Small random fluctuation (jitter) for realism mimicking sensor noise processing
         jitter = np.random.uniform(-1.0, 1.0)
@@ -298,5 +367,6 @@ class NeuralPredictionEngine(BasePredictionEngine):
                 "weights_loaded": self.weights_loaded,
                 "residuals_loaded": self.residuals_loaded,
                 "standardized": True,
+                "physics_blend": round(blend, 3),
             },
         )
