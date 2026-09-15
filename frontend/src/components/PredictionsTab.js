@@ -58,7 +58,10 @@ export function renderPredictionsTab(state) {
               <input type="number" id="sim-curr-temp" value="${initialTemp}" step="0.5" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 13px; box-sizing: border-box;">
             </div>
             <div>
-              <label style="display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px;">Outdoor Temp (°F)</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label style="display: block; font-size: 11px; font-weight: 600; color: #475569;">Outdoor Temp (°F)</label>
+                <button id="btn-fetch-meteo" type="button" style="background: #e2e8f0; border: none; color: #0f172a; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; cursor: pointer;">FETCH API</button>
+              </div>
               <input type="number" id="sim-outdoor-temp" value="${initialOutdoor}" step="1" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-family: inherit; font-size: 13px; box-sizing: border-box;">
             </div>
           </div>
@@ -217,6 +220,25 @@ export function renderPredictionsTab(state) {
       }
     });
   });
+
+  const btnFetch = container.querySelector('#btn-fetch-meteo');
+  if (btnFetch) {
+    btnFetch.addEventListener('click', async () => {
+      btnFetch.innerText = 'FETCHING...';
+      try {
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=12.8406&longitude=80.1534&current=temperature_2m,relative_humidity_2m&temperature_unit=fahrenheit');
+        const data = await res.json();
+        const temp = data.current.temperature_2m;
+        container.querySelector('#sim-outdoor-temp').value = temp;
+        btnFetch.innerText = 'FETCH API';
+        logTelemetry(`Fetched VIT Chennai API Outdoor Temp: ${temp}°F`, true);
+      } catch (err) {
+        console.error(err);
+        btnFetch.innerText = 'FAILED';
+        setTimeout(() => btnFetch.innerText = 'FETCH API', 2000);
+      }
+    });
+  }
 
   const getActionBadgeStyle = (actName) => {
     switch (actName) {
