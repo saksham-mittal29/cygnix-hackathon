@@ -1,0 +1,9 @@
+scenario,state_description,Q_NO_ACTION,Q_COOL_LOW,Q_COOL_MEDIUM,Q_COOL_HIGH,Q_PRECOOL,Q_REDUCE_HVAC,selected_action,q_max_margin_over_no_action,q_max_margin_over_second
+State_1_Comfortable,"Indoor 72°F in [70, 74]°F, mild outdoor 75°F, solar 1kW, tariff 10",-0.8612,-0.8955,-0.6161,-0.8186,-0.8093,-0.9597,COOL_MEDIUM,0.2451,0.1933
+State_2_Moderately_Warm,"Indoor 76.5°F > 74°F upper bound, outdoor 82°F, solar 1kW, tariff 10",-4.6238,-4.4869,-4.2701,-4.2677,-4.2784,-4.9551,COOL_HIGH,0.3561,0.0024
+State_3_Hot_Severe,"Indoor 80.0°F severely above bound, outdoor 95°F, solar 2kW, tariff 12",-6.6341,-6.4092,-6.2939,-6.1416,-6.1304,-7.13,PRECOOL,0.5037,0.0112
+State_4_High_Solar,"Indoor 75.0°F near upper bound, high solar 6.0 kW, tariff 15",-2.1597,-2.1403,-1.8283,-1.9592,-1.9885,-2.3423,COOL_MEDIUM,0.3314,0.1309
+State_5_High_Tariff_Peak,"Indoor 75.0°F, peak tariff 45.0, zero solar",-2.8598,-2.8113,-2.5415,-2.634,-2.6406,-3.0827,COOL_MEDIUM,0.3183,0.0925
+State_6_Narrow_Envelope,"Indoor 73.5°F > 73°F upper bound with narrow band [71, 73]°F",-1.8829,-1.8706,-1.5651,-1.7214,-1.741,-2.0337,COOL_MEDIUM,0.3178,0.1563
+State_7_Overcooled,"Indoor 68.0°F < 70°F lower bound, outdoor 70°F, solar 0kW, tariff 10",0.3373,0.2616,0.3261,0.1867,0.2855,0.2686,NO_ACTION,0.0,0.0112
+State_8_Forecast_Warming,"Indoor 73.0°F (currently ok) but +30min forecast 76.5°F (rapid warming), solar 3kW",-1.0075,-1.0314,-0.7379,-0.9199,-0.9441,-1.1059,COOL_MEDIUM,0.2696,0.182
