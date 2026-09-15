@@ -1,0 +1,7 @@
+weight_regime,alpha_comfort,beta_energy,gamma_cost,delta_switching,lambda_solar,cumulative_reward,total_comfort_penalty,total_energy_kwh,total_cost,total_switching_events,solar_used_kwh
+1_DEFAULT,1.0,0.1,0.01,0.5,0.05,-25.4713,24.5448,8.5292,0.0,1,8.5292
+2_COMFORT_HEAVY,5.0,0.05,0.005,0.1,0.02,-123.0799,24.5448,8.5292,0.0,1,8.5292
+3_ENERGY_HEAVY,0.5,1.0,0.01,0.5,0.05,-20.8751,24.5448,8.5292,0.0,1,8.5292
+4_COST_HEAVY,0.5,0.1,0.1,0.5,0.05,-13.1989,24.5448,8.5292,0.0,1,8.5292
+5_SWITCHING_HEAVY,1.0,0.1,0.01,5.0,0.05,-29.9713,24.5448,8.5292,0.0,1,8.5292
+6_SOLAR_HEAVY,1.0,0.1,0.01,0.5,0.5,-21.6331,24.5448,8.5292,0.0,1,8.5292

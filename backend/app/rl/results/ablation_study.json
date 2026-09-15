@@ -1,0 +1,58 @@
+[
+  {
+    "ablation_variant": "A_FULL",
+    "features_retained_count": 16,
+    "dominant_action": "COOL_MEDIUM",
+    "action_entropy": 0.868,
+    "mean_q_margin_over_no_action": 0.3135,
+    "all_actions": "COOL_MEDIUM, COOL_HIGH, PRECOOL, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM"
+  },
+  {
+    "ablation_variant": "B_NO_FORECAST",
+    "features_retained_count": 10,
+    "dominant_action": "COOL_MEDIUM",
+    "action_entropy": -0.0,
+    "mean_q_margin_over_no_action": 0.3295,
+    "all_actions": "COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM"
+  },
+  {
+    "ablation_variant": "C_NO_CONFIDENCE",
+    "features_retained_count": 15,
+    "dominant_action": "COOL_MEDIUM",
+    "action_entropy": 0.868,
+    "mean_q_margin_over_no_action": 0.3211,
+    "all_actions": "COOL_MEDIUM, COOL_HIGH, PRECOOL, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM"
+  },
+  {
+    "ablation_variant": "D_NO_PREFERENCE",
+    "features_retained_count": 12,
+    "dominant_action": "COOL_MEDIUM",
+    "action_entropy": 1.011,
+    "mean_q_margin_over_no_action": 0.2762,
+    "all_actions": "COOL_MEDIUM, COOL_HIGH, COOL_HIGH, COOL_MEDIUM, COOL_MEDIUM, NO_ACTION"
+  },
+  {
+    "ablation_variant": "E_NO_SOLAR",
+    "features_retained_count": 15,
+    "dominant_action": "COOL_MEDIUM",
+    "action_entropy": 1.011,
+    "mean_q_margin_over_no_action": 0.293,
+    "all_actions": "COOL_MEDIUM, COOL_HIGH, COOL_HIGH, COOL_MEDIUM, COOL_MEDIUM, NO_ACTION"
+  },
+  {
+    "ablation_variant": "F_NO_TARIFF",
+    "features_retained_count": 15,
+    "dominant_action": "COOL_MEDIUM",
+    "action_entropy": 0.868,
+    "mean_q_margin_over_no_action": 0.3132,
+    "all_actions": "COOL_MEDIUM, COOL_HIGH, PRECOOL, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM"
+  },
+  {
+    "ablation_variant": "G_MINIMAL",
+    "features_retained_count": 3,
+    "dominant_action": "COOL_MEDIUM",
+    "action_entropy": -0.0,
+    "mean_q_margin_over_no_action": 0.2983,
+    "all_actions": "COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM, COOL_MEDIUM"
+  }
+]
