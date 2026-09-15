@@ -1,6 +1,6 @@
 import { initialData } from "./data/mockData.js";
 import { renderNavbar } from "./components/Navbar.js";
-import { renderPredictionsTab } from "./components/PredictionsTab.js?v=2";
+import { renderPredictionsTab } from "./components/PredictionsTab.js?v=3";
 import { renderDashboardTab } from "./components/DashboardTab.js";
 import { renderMetricsTab } from "./components/MetricsTab.js";
 import { renderThermostatsTab } from "./components/ThermostatsTab.js";
