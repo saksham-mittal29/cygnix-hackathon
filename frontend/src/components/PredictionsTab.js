@@ -214,10 +214,18 @@ export function renderPredictionsTab(state) {
           </div>
 
           <!-- Key Metrics Grid -->
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
             <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
               <div style="font-size: 11px; color: #64748b; font-weight: 600;">Current Temp</div>
               <div style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 4px;" id="m-curr-temp">--°F</div>
+            </div>
+            <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+              <div style="font-size: 11px; color: #64748b; font-weight: 600;">Indoor Humidity</div>
+              <div style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 4px;" id="m-curr-hum">--%</div>
+            </div>
+            <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+              <div style="font-size: 11px; color: #64748b; font-weight: 600;">Airflow Volume</div>
+              <div style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 4px;" id="m-curr-airflow">-- CFM</div>
             </div>
             <div style="background: #f8fafc; padding: 10px 8px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
               <div style="font-size: 11px; color: #64748b; font-weight: 600;">Battery</div>
@@ -558,6 +566,8 @@ export function renderPredictionsTab(state) {
   };
 
   let simulatedCurrentTemp = 76.5;
+  let simulatedCurrentHum = 50.0;
+  let simulatedAirflow = 0;
 
   const performSimulationStep = async (stepCount) => {
     const mode = container.querySelector('input[name="pred-source"]:checked')?.value || 'simulation';
@@ -581,17 +591,20 @@ export function renderPredictionsTab(state) {
     
     let activeSolar = isDay ? solKw : 0.0;
 
-    let currHum = 50.0;
+    let currHum = simulatedCurrentHum;
     let actualOutdoor = outTemp;
     if (mode === 'live') {
-      currHum = parseFloat(container.querySelector('#live-curr-hum').value) || 55.0;
       actualOutdoor = cachedLiveOutdoorTemp || 81.1;
       if (stepCount === 0) {
         simulatedCurrentTemp = parseFloat(container.querySelector('#live-curr-temp').value) || 75.2;
+        simulatedCurrentHum = parseFloat(container.querySelector('#live-curr-hum').value) || 55.0;
+        currHum = simulatedCurrentHum;
         logTelemetry(`Live mode initialized. Sensor: ${simulatedCurrentTemp}°F | Outdoor (${cachedLocationName}): ${actualOutdoor}°F`);
       }
     } else if (stepCount === 0) {
       simulatedCurrentTemp = parseFloat(container.querySelector('#sim-curr-temp').value) || 76.5;
+      simulatedCurrentHum = 50.0;
+      currHum = simulatedCurrentHum;
       logTelemetry(`Booting Agent... Analyzing ${outTemp}°F outdoor temp.`);
     }
 
@@ -675,6 +688,23 @@ export function renderPredictionsTab(state) {
       } else {
         initChart();
       }
+      
+      // Update Airflow and Humidity based on AI action
+      if (data.action === "COOL_HIGH" || data.action === "PRECOOL") {
+        simulatedAirflow = 800;
+        simulatedCurrentHum = Math.max(35.0, simulatedCurrentHum - 1.5); // Dehumidify
+      } else if (data.action === "COOL_MEDIUM") {
+        simulatedAirflow = 600;
+        simulatedCurrentHum = Math.max(40.0, simulatedCurrentHum - 1.0);
+      } else if (data.action === "COOL_LOW" || data.action === "REDUCE_HVAC") {
+        simulatedAirflow = 400;
+        simulatedCurrentHum = Math.max(45.0, simulatedCurrentHum - 0.5);
+      } else {
+        simulatedAirflow = 0;
+        // Slowly creep back up towards outdoor humidity
+        const targetHum = mode === 'live' ? (cachedLiveOutdoorHum || 65.0) : 60.0;
+        simulatedCurrentHum = Math.min(targetHum, simulatedCurrentHum + 0.8);
+      }
 
       // Update UI Action Card
       const confScore = container.querySelector("#conf-score");
@@ -693,6 +723,8 @@ export function renderPredictionsTab(state) {
       container.querySelector("#action-explanation").style.borderLeftColor = badgeInfo.bg;
       
       container.querySelector("#m-curr-temp").innerText = `${data.current_temp.toFixed(1)}°F`;
+      container.querySelector("#m-curr-hum").innerText = `${simulatedCurrentHum.toFixed(1)}%`;
+      container.querySelector("#m-curr-airflow").innerText = `${simulatedAirflow} CFM`;
       container.querySelector("#m-pref-band").innerText = `[${pLow}, ${pHigh}]°F`;
       container.querySelector("#m-time").innerText = `${elapsedMins} min`;
 
