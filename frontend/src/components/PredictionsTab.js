@@ -112,7 +112,6 @@ export function renderPredictionsTab(state) {
               <span style="font-size: 11px; font-weight: 700; color: #334155;">ESP32 DHT22 Telemetry</span>
               <span id="live-sensor-badge" style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #fee2e2; color: #b91c1c;">OFFLINE</span>
             </div>
-            <div id="live-sensor-port" style="font-size: 10px; color: #64748b; margin-top: 3px; font-family: monospace;">No active ESP32 data on USB (115200 baud)</div>
           </div>
           <div style="margin-bottom: 10px;">
             <label style="display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px;">Live Room Temp (°F)</label>
@@ -132,6 +131,27 @@ export function renderPredictionsTab(state) {
               <button id="btn-search-city" type="button" style="background: #15803d; color: white; border: none; border-radius: 5px; padding: 0 10px; font-size: 11px; font-weight: 700; cursor: pointer;">Set</button>
             </div>
             <div style="font-size: 12px; font-weight: 700; color: #15803d;" id="live-outdoor-display">Open-Meteo: Fetching...</div>
+          </div>
+          <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748b;">Comfort Target Band</div>
+              <select id="live-autopilot-profile" style="font-size: 10px; padding: 2px 4px; border-radius: 4px; border: 1px solid #cbd5e1; background: white; cursor: pointer; color: #2563eb; font-weight: 700;">
+                <option value="custom">Autopilot: Off (Manual)</option>
+                <option value="profile_a" selected>Autopilot: User A (70°-74°F)</option>
+                <option value="profile_b">Autopilot: Cold Sleeper (66°-70°F)</option>
+                <option value="profile_c">Autopilot: Eco Saver (74°-78°F)</option>
+              </select>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <label style="display: block; font-size: 11px; color: #475569; margin-bottom: 4px;">Low Bound (°F)</label>
+                <input type="number" id="live-pref-temp-low" value="${initialPrefLow}" step="0.5" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 12px; box-sizing: border-box;">
+              </div>
+              <div>
+                <label style="display: block; font-size: 11px; color: #475569; margin-bottom: 4px;">High Bound (°F)</label>
+                <input type="number" id="live-pref-temp-high" value="${initialPrefHigh}" step="0.5" style="width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 12px; box-sizing: border-box;">
+              </div>
+            </div>
           </div>
           <div style="margin-bottom: 12px;">
             <label style="display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px;">Live Dispatch Rate</label>
@@ -289,7 +309,6 @@ export function renderPredictionsTab(state) {
       if (res.ok) {
         const data = await res.json();
         const badge = container.querySelector("#live-sensor-badge");
-        const portEl = container.querySelector("#live-sensor-port");
         const outdoorEl = container.querySelector("#live-outdoor-display");
         const tempInput = container.querySelector("#live-curr-temp");
         const humInput = container.querySelector("#live-curr-hum");
@@ -301,20 +320,18 @@ export function renderPredictionsTab(state) {
             badge.style.background = "#dcfce7";
             badge.style.color = "#15803d";
           }
-          if (portEl) portEl.innerText = `${data.port} @ 115200 baud`;
         } else {
           if (badge) {
             badge.innerText = "OFFLINE";
             badge.style.background = "#fee2e2";
             badge.style.color = "#b91c1c";
           }
-          if (portEl) portEl.innerText = "No active ESP32 data on USB (115200 baud)";
         }
 
-        if (data.indoor_temp_f && tempInput && !isSimulating) {
+        if (data.indoor_temp_f && tempInput) {
           tempInput.value = data.indoor_temp_f.toFixed(1);
         }
-        if (data.indoor_humidity && humInput && !isSimulating) {
+        if (data.indoor_humidity && humInput) {
           humInput.value = data.indoor_humidity.toFixed(1);
         }
         if (data.outdoor_temp_f !== undefined) {
@@ -406,6 +423,28 @@ export function renderPredictionsTab(state) {
     // Switch to manual if user manually edits bounds
     lowBoundInput.addEventListener('input', () => autopilotSelect.value = 'custom');
     highBoundInput.addEventListener('input', () => autopilotSelect.value = 'custom');
+  }
+
+  const liveAutopilotSelect = container.querySelector('#live-autopilot-profile');
+  const liveLowBoundInput = container.querySelector('#live-pref-temp-low');
+  const liveHighBoundInput = container.querySelector('#live-pref-temp-high');
+
+  if (liveAutopilotSelect && liveLowBoundInput && liveHighBoundInput) {
+    liveAutopilotSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'profile_a') {
+        liveLowBoundInput.value = 70;
+        liveHighBoundInput.value = 74;
+      } else if (e.target.value === 'profile_b') {
+        liveLowBoundInput.value = 66;
+        liveHighBoundInput.value = 70;
+      } else if (e.target.value === 'profile_c') {
+        liveLowBoundInput.value = 74;
+        liveHighBoundInput.value = 78;
+      }
+    });
+    
+    liveLowBoundInput.addEventListener('input', () => liveAutopilotSelect.value = 'custom');
+    liveHighBoundInput.addEventListener('input', () => liveAutopilotSelect.value = 'custom');
   }
 
   const btnFetch = container.querySelector('#btn-fetch-meteo');
@@ -521,12 +560,16 @@ export function renderPredictionsTab(state) {
   let simulatedCurrentTemp = 76.5;
 
   const performSimulationStep = async (stepCount) => {
-    const pLow = parseFloat(container.querySelector('#pref-temp-low').value) || 70.0;
-    const pHigh = parseFloat(container.querySelector('#pref-temp-high').value) || 74.0;
+    const mode = container.querySelector('input[name="pred-source"]:checked')?.value || 'simulation';
+    const pLow = mode === 'live'
+      ? (parseFloat(container.querySelector('#live-pref-temp-low')?.value) || 70.0)
+      : (parseFloat(container.querySelector('#pref-temp-low')?.value) || 70.0);
+    const pHigh = mode === 'live'
+      ? (parseFloat(container.querySelector('#live-pref-temp-high')?.value) || 74.0)
+      : (parseFloat(container.querySelector('#pref-temp-high')?.value) || 74.0);
     const outTemp = parseFloat(container.querySelector('#sim-outdoor-temp').value) || 82.0;
     const solKw = parseFloat(container.querySelector('#sim-solar-kw').value) || 0.0;
     const tod = container.querySelector('#sim-tod').value;
-    const mode = container.querySelector('input[name="pred-source"]:checked')?.value || 'simulation';
     
     // ToD Logic
     let tariff = 10.0;
@@ -541,10 +584,10 @@ export function renderPredictionsTab(state) {
     let currHum = 50.0;
     let actualOutdoor = outTemp;
     if (mode === 'live') {
-      simulatedCurrentTemp = parseFloat(container.querySelector('#live-curr-temp').value) || 75.2;
       currHum = parseFloat(container.querySelector('#live-curr-hum').value) || 55.0;
       actualOutdoor = cachedLiveOutdoorTemp || 81.1;
       if (stepCount === 0) {
+        simulatedCurrentTemp = parseFloat(container.querySelector('#live-curr-temp').value) || 75.2;
         logTelemetry(`Live mode initialized. Sensor: ${simulatedCurrentTemp}°F | Outdoor (${cachedLocationName}): ${actualOutdoor}°F`);
       }
     } else if (stepCount === 0) {
@@ -614,7 +657,8 @@ export function renderPredictionsTab(state) {
       container.querySelector("#cost-savings").innerText = `$${Math.max(0, savings).toFixed(3)}`;
 
       // Update Chart Data Arrays
-      const elapsedMins = stepCount * 15;
+      const stepDurationMins = mode === 'live' ? (intervalSecs === 60 ? 1 : 5) : 15;
+      const elapsedMins = stepCount * stepDurationMins;
       const timeStr = elapsedMins === 0 ? "Now" : `+${elapsedMins}m`;
       chartLabels.push(timeStr);
       
@@ -754,6 +798,26 @@ export function renderPredictionsTab(state) {
         container.querySelector("#chart-status").innerText = "Completed";
         const savings = cumulativeLegacyCost - cumulativeNeuralCost;
         logTelemetry(`Schedule complete. Total savings: $${savings.toFixed(3)}`, true);
+        
+        try {
+          fetch("http://localhost:8000/api/log_simulation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+              time_of_day: container.querySelector('#sim-tod')?.value || "Afternoon",
+              initial_temp: parseFloat(container.querySelector(mode === 'live' ? '#live-curr-temp' : '#sim-curr-temp')?.value) || 75.0,
+              outdoor_temp: mode === 'live' ? cachedLiveOutdoorTemp : (parseFloat(container.querySelector('#sim-outdoor-temp')?.value) || 82.0),
+              target_band: `[${pLow}, ${pHigh}]`,
+              solar_kw: parseFloat(container.querySelector('#sim-solar-kw')?.value) || 0.0,
+              base_tariff: 10.0,
+              legacy_cost: cumulativeLegacyCost,
+              neural_cost: cumulativeNeuralCost,
+              total_savings: Math.max(0, savings),
+              actions_taken: []
+            })
+          });
+        } catch (e) {}
         return;
       }
       secondsRemaining = intervalSecs;
